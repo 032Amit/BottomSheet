@@ -1,5 +1,5 @@
-import {View, Dimensions, StyleSheet} from 'react-native';
-import React, {useRef, useCallback, useImperativeHandle} from 'react';
+import {View, Dimensions, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useCallback, useImperativeHandle} from 'react';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -12,6 +12,8 @@ const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50;
 
 const BottomSheet = React.forwardRef(({children, updateOpacityCB}, ref) => {
+  const isModalActive = ref?.current?.isActive();
+
   const translateY = useSharedValue(0);
   const active = useSharedValue(false);
 
@@ -54,12 +56,28 @@ const BottomSheet = React.forwardRef(({children, updateOpacityCB}, ref) => {
     };
   });
 
+  const closeBSModal = () => {
+    if (isModalActive) {
+      scrollTo(0);
+      runOnJS(updateOpacityCB)();
+    }
+  };
+
   return (
     <GestureDetector gesture={gesture}>
-      <Animated.View style={[styles.rootContainer, bottomSheetStyle]}>
-        <View style={styles.lineStyle} />
-        {children}
-      </Animated.View>
+      <>
+        <Animated.View style={[styles.rootContainer, bottomSheetStyle]}>
+          <View style={styles.lineStyle} />
+          {children}
+        </Animated.View>
+        <TouchableOpacity
+          style={[
+            styles.outsideBtn,
+            !isModalActive ? {top: '50%'} : {bottom: '50%'},
+          ]}
+          onPress={closeBSModal}
+        />
+      </>
     </GestureDetector>
   );
 });
@@ -79,7 +97,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignSelf: 'center',
     marginVertical: -15,
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
+  },
+  outsideBtn: {
+    position: 'absolute',
+    width: '100%',
+    height: '50%',
   },
 });
 
