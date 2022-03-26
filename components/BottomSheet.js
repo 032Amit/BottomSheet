@@ -1,10 +1,11 @@
 import {View, Dimensions, StyleSheet} from 'react-native';
-import React, {useCallback, useImperativeHandle} from 'react';
+import React, {useRef, useCallback, useImperativeHandle} from 'react';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  runOnJS,
 } from 'react-native-reanimated';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
@@ -31,7 +32,6 @@ const BottomSheet = React.forwardRef(({children, updateOpacityCB}, ref) => {
 
   const gesture = Gesture.Pan()
     .onStart(() => {
-      // runOnJS(updateOpacityCB)();
       context.value = {y: translateY.value};
     })
     .onUpdate(event => {
@@ -41,8 +41,10 @@ const BottomSheet = React.forwardRef(({children, updateOpacityCB}, ref) => {
     .onEnd(() => {
       if (translateY.value > -SCREEN_HEIGHT / 2) {
         scrollTo(0);
+        runOnJS(updateOpacityCB)();
       } else if (translateY.value < -SCREEN_HEIGHT / 1.5) {
         scrollTo(0);
+        runOnJS(updateOpacityCB)();
       }
     });
 
@@ -64,7 +66,6 @@ const BottomSheet = React.forwardRef(({children, updateOpacityCB}, ref) => {
 
 const styles = StyleSheet.create({
   rootContainer: {
-    opacity: Animated.add(0.1, Animated.multiply(2, 1.0)),
     height: SCREEN_HEIGHT,
     width: '100%',
     borderRadius: 20,

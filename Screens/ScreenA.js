@@ -21,11 +21,12 @@ const ScreenA = ({navigation, route}) => {
 
   const updateOpacityCB = () => {
     const isActive = ref?.current?.isActive();
-    // if (isActive) {
-    //   setIsBSActive(false);
-    // } else {
-    //   setIsBSActive(true);
-    // }
+    console.log('Bottom sheet callback called...', isActive);
+    if (!isActive) {
+      setIsBSActive(false);
+    } else {
+      setIsBSActive(true);
+    }
   };
 
   const onPress = useCallback(() => {
